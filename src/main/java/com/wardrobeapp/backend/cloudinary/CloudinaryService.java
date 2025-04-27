@@ -15,7 +15,7 @@ import static com.cloudinary.utils.ObjectUtils.emptyMap;
 @Log4j
 @Service
 public class CloudinaryService {
-    private static final Logger logger = Logger.getLogger(CloudinaryService.class.getName());
+    private static final Logger LOG = Logger.getLogger(CloudinaryService.class.getName());
     private static final String CLOUDINARY_NAME = "dw4erlpei";
     private static final String CLOUD_NAME_PARAM = "cloud_name";
     private static final String API_KEY_PARAM = "api_key";
@@ -32,7 +32,7 @@ public class CloudinaryService {
                     API_KEY_PARAM, Encryption.decrypt(cloudinaryKey),
                     API_SECRET_PARAM, Encryption.decrypt(cloudinarySecret)));
             cloudinary.uploader().upload(imageLink, emptyMap());
-            logger.info("Uploading is completed");
+            LOG.info("Uploading is completed");
         } catch (IOException e) {
             throw new RuntimeException("Cloudinary upload failed", e);
         }

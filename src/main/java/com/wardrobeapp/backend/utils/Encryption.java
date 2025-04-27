@@ -8,7 +8,7 @@ import javax.crypto.spec.SecretKeySpec;
 
 @Service
 public class Encryption {
-    private static final String ALGORITHM = "AES/CBC/PKCS5Padding";
+    private static final String ALGORITHM = "AES";
     private static final String SECRET_KEY = System.getenv("SECRET_KEY");
 
     private Encryption() {
