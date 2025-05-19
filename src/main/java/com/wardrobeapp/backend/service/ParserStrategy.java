@@ -1,4 +1,4 @@
-package com.wardrobeapp.backend.parser;
+package com.wardrobeapp.backend.service;
 
 import org.springframework.stereotype.Service;
 

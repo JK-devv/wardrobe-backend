@@ -1,6 +1,8 @@
-package com.wardrobeapp.backend.parser.impl;
+package com.wardrobeapp.backend.service.impl;
 
-import com.wardrobeapp.backend.parser.Parser;
+import com.wardrobeapp.backend.model.dto.ProductDto;
+import com.wardrobeapp.backend.model.event.ProductParseEvent;
+import com.wardrobeapp.backend.service.Parser;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import lombok.extern.slf4j.Slf4j;
 import org.openqa.selenium.By;
@@ -10,20 +12,25 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.UUID;
 
 
 @Slf4j
 @Service
-public class ZaraParsers implements Parser {
+public class ZaraParsersImpl implements Parser {
     private final WebDriver driver;
-    private static final Logger LOG = LoggerFactory.getLogger(ZaraParsers.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ZaraParsersImpl.class);
     private static final String ZARA_PATH = "zara.com";
     private static final String IMG_SELECTOR = "img";
     private static final String SRC_ATTRIBUTE = "src";
+    private static final String BRAND_NAME = "zara";
+    private static final String H1 = "h1";
 
-
-    public ZaraParsers() {
+    public ZaraParsersImpl() {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
@@ -35,19 +42,28 @@ public class ZaraParsers implements Parser {
     }
 
     @Override
-    public String parseImage(String link) {
+    public ProductDto parseProduct(String link) {
         String imageLink = null;
+        String productName = null;
         try {
             driver.get(link);
             WebElement imageElement = driver.findElement(By.cssSelector(IMG_SELECTOR));
             imageLink = imageElement.getAttribute(SRC_ATTRIBUTE);
+
+            List<WebElement> h1 = driver.findElements(By.tagName(H1));
+            productName = h1.stream()
+                    .map(WebElement::getText)
+                    .filter(text -> !text.isBlank())
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Somethings went wrong"));
 
         } catch (Exception e) {
             LOG.error(String.format("Exception happened while parsing page : %s", e.getMessage()));
         } finally {
             driver.quit();
         }
-        return imageLink;
+        return new ProductDto(UUID.randomUUID(), productName, BRAND_NAME, imageLink);
+
     }
 
     @Override

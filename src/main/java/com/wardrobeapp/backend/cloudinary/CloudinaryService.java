@@ -20,22 +20,29 @@ public class CloudinaryService {
     private static final String CLOUD_NAME_PARAM = "cloud_name";
     private static final String API_KEY_PARAM = "api_key";
     private static final String API_SECRET_PARAM = "api_secret";
+    public static final String SECURE_URL = "secure_url";
     @Value("${cloudinary.api.key}")
     private String cloudinaryKey;
     @Value("${cloudinary.api.secret}")
     private String cloudinarySecret;
 
-    public void uploadImage(String imageLink) {
+
+    public String uploadProductsImage(String imageLink) {
+        String cloudinaryLink = null;
         try {
             Cloudinary cloudinary = new Cloudinary(asMap(
                     CLOUD_NAME_PARAM, CLOUDINARY_NAME,
                     API_KEY_PARAM, Encryption.decrypt(cloudinaryKey),
                     API_SECRET_PARAM, Encryption.decrypt(cloudinarySecret)));
-            cloudinary.uploader().upload(imageLink, emptyMap());
+            cloudinaryLink = cloudinary.uploader().upload(imageLink, emptyMap())
+                    .get(SECURE_URL).toString();
+
             LOG.info("Uploading is completed");
         } catch (IOException e) {
             throw new RuntimeException("Cloudinary upload failed", e);
         }
+
+        return cloudinaryLink;
 
     }
 }
